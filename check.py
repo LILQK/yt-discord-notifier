@@ -16,7 +16,7 @@ last = open(STATE).read().strip() if os.path.exists(STATE) else ""
 
 if vid != last:
     if last:  # la primera ejecución solo guarda el estado, no avisa
-        msg = {"content": f"📢 **¡Nuevo vídeo!** {title}\nhttps://youtu.be/{vid}"}
+        msg = {"content": f"📢 **New video!** {title}\nhttps://youtu.be/{vid}"}
         req = urllib.request.Request(WEBHOOK, json.dumps(msg).encode(),
                                      {"Content-Type": "application/json", "User-Agent": "yt-notifier"})
         urllib.request.urlopen(req)
