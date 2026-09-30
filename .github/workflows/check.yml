@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python check.py
+      - run: python check.py || echo "failed=1" >> $GITHUB_ENV
         env:
           YT_CHANNEL_ID: ${{ secrets.YT_CHANNEL_ID }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          PATREON_TOKEN: ${{ secrets.PATREON_TOKEN }}
       - run: |
           git config user.name bot && git config user.email bot@users.noreply.github.com
-          git add last_video.txt && git commit -m "update" && git push || true
+          git add last_*.txt && git commit -m "update" && git push || true
+      - if: env.failed == '1'
+        run: exit 1
