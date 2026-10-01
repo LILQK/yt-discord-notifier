@@ -1,4 +1,4 @@
-import os, json, urllib.request, xml.etree.ElementTree as ET
+import os, json, urllib.request, urllib.error, xml.etree.ElementTree as ET
 
 WEBHOOK = os.environ["DISCORD_WEBHOOK"]
 NS = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
@@ -23,7 +23,13 @@ def check(state_file, item_id, message):
 
 def youtube():
     channel = os.environ["YT_CHANNEL_ID"]
-    feed = urllib.request.urlopen(f"https://www.youtube.com/feeds/videos.xml?channel_id={channel}").read()
+    try:
+        feed = urllib.request.urlopen(f"https://www.youtube.com/feeds/videos.xml?channel_id={channel}").read()
+    except urllib.error.HTTPError as e:
+        if e.code == 404 or e.code >= 500:  # el feed de YouTube falla a ratos; se reintenta en la siguiente
+            print("YouTube: fallo temporal del feed", e.code)
+            return
+        raise
     entry = ET.fromstring(feed).find("a:entry", NS)
     if entry is None:
         return
